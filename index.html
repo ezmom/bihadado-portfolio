@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIHADADO LATRICO — Banner Portfolio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--card:#141414;--border:#222;--accent:#4ECDC4;--pink:#FFB7B2;--red:#FF6B6B;--green:#4ECDC4;--yellow:#FFD93D;--text:#fff;--muted:#888;--dim:#555}
+body{font-family:Inter,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* AUTH GATE */
+#authGate{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+#authGate.hidden{display:none}
+#authGate h1{font-size:28px;font-weight:900;background:linear-gradient(135deg,#FF6B6B,#FFB7B2,#4ECDC4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+#authGate input{background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:14px 24px;color:#fff;font-size:16px;width:300px;text-align:center;outline:none}
+#authGate input:focus{border-color:var(--accent)}
+#authGate button{background:var(--accent);color:#000;border:none;padding:12px 32px;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer}
+#authGate .err{color:var(--red);font-size:13px;min-height:20px}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 24px}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.logo{font-size:18px;font-weight:900;background:linear-gradient(135deg,#FF6B6B,#FFB7B2,#4ECDC4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stats-bar{display:flex;gap:16px;font-size:12px;color:var(--muted)}
+.stats-bar .val{font-weight:700}
+.stats-bar .good{color:var(--green)}
+.stats-bar .bad{color:var(--red)}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filter-btn{background:#1a1a1a;border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.filter-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
+.sort-select{background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--text);outline:none;cursor:pointer}
+.search-input{background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--text);outline:none;width:180px}
+.search-input:focus{border-color:var(--accent)}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:20px 24px}
+.card{background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border);transition:transform .2s,box-shadow .2s;cursor:pointer;position:relative}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.card-body{padding:10px 12px}
+.card-body .tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
+.tag{font-size:9px;padding:2px 6px;border-radius:10px;font-weight:600}
+.tag-version{background:#1e3a38;color:var(--accent)}
+.tag-concept{background:#3a1e2a;color:var(--pink)}
+.tag-extra{background:#2a2a1e;color:var(--yellow)}
+.card-body h3{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-body p{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity .2s}
+.card:hover .card-actions{opacity:1}
+.rate-btn{width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:transform .15s}
+.rate-btn:hover{transform:scale(1.15)}
+.rate-good{background:rgba(78,205,196,0.85);color:#000}
+.rate-bad{background:rgba(255,107,107,0.85);color:#fff}
+.card.rated-good{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}
+.card.rated-bad{border-color:var(--red);opacity:.5}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.active{display:flex}
+.modal{background:#111;border-radius:16px;max-width:900px;width:100%;max-height:90vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr}
+.modal-img{position:relative}
+.modal-img img{width:100%;display:block;border-radius:16px 0 0 16px}
+.modal-img .img-toggle{position:absolute;bottom:12px;left:12px;display:flex;gap:6px}
+.modal-img .img-toggle button{background:rgba(0,0,0,0.7);border:1px solid #444;border-radius:8px;padding:6px 12px;color:#fff;font-size:11px;cursor:pointer}
+.modal-img .img-toggle button.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.modal-detail{padding:24px;display:flex;flex-direction:column;gap:12px}
+.modal-detail h2{font-size:18px;font-weight:700}
+.modal-detail .meta-row{display:flex;gap:8px;flex-wrap:wrap}
+.modal-detail .prompt-box{background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;line-height:1.6;color:#ccc;white-space:pre-wrap;max-height:200px;overflow-y:auto}
+.modal-detail .rate-row{display:flex;gap:12px;margin-top:auto}
+.modal-detail .rate-row button{flex:1;padding:12px;border-radius:12px;border:none;font-size:15px;font-weight:700;cursor:pointer}
+.modal-detail .rate-row .btn-good{background:var(--green);color:#000}
+.modal-detail .rate-row .btn-bad{background:var(--red);color:#fff}
+.modal-detail .rate-row .btn-reset{background:#1a1a1a;color:var(--muted);border:1px solid var(--border)}
+.modal-close{position:absolute;top:16px;right:16px;background:rgba(0,0,0,0.6);border:none;color:#fff;width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer;z-index:10}
+.modal-dl{display:flex;gap:8px;margin-top:8px}
+.modal-dl a{font-size:12px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:8px;padding:6px 12px;transition:all .15s}
+.modal-dl a:hover{background:var(--accent);color:#000}
+
+/* COUNT BADGE */
+.count-badge{font-size:12px;color:var(--muted);padding:0 24px 8px}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .modal{grid-template-columns:1fr}
+  .modal-img img{border-radius:16px 16px 0 0}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="authGate">
+  <h1>BIHADADO PORTFOLIO</h1>
+  <p style="color:#888;font-size:13px">Password required</p>
+  <input type="password" id="authInput" placeholder="Enter password" autofocus>
+  <button onclick="tryAuth()">Enter</button>
+  <div class="err" id="authErr"></div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="display:none">
+<header>
+  <div class="header-top">
+    <div class="logo">BIHADADO PORTFOLIO</div>
+    <div class="stats-bar">
+      <span>Total: <span class="val" id="totalCount">0</span></span>
+      <span>Showing: <span class="val" id="showCount">0</span></span>
+      <span class="good">GOOD: <span class="val" id="goodCount">0</span></span>
+      <span class="bad">BAD: <span class="val" id="badCount">0</span></span>
+    </div>
+  </div>
+  <div class="filters">
+    <select class="sort-select" id="sortSelect">
+      <option value="random">Random</option>
+      <option value="version">Version</option>
+      <option value="concept">Concept</option>
+      <option value="pattern">Pattern</option>
+      <option value="winScore-desc">WinScore High</option>
+      <option value="winScore-asc">WinScore Low</option>
+      <option value="rated-first">Rated First</option>
+      <option value="unrated-first">Unrated First</option>
+    </select>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search copy/pattern...">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="C1">C1 飲むスキンケア</button>
+    <button class="filter-btn" data-filter="C2">C2 届かない</button>
+    <button class="filter-btn" data-filter="C3">C3 通わない皮膚科</button>
+    <button class="filter-btn" data-filter="C4">C4 サプリじゃなく薬</button>
+    <button class="filter-btn" data-filter="C5">C5 内側から変わる</button>
+    <button class="filter-btn" data-filter="old">旧バッチ</button>
+    <span style="width:1px;height:20px;background:#333"></span>
+    <button class="filter-btn" data-filter="good">GOOD Only</button>
+    <button class="filter-btn" data-filter="bad">BAD Only</button>
+    <button class="filter-btn" data-filter="unrated">Unrated</button>
+    <span style="width:1px;height:20px;background:#333"></span>
+    <button class="filter-btn" data-filter="extra" style="border-color:#FFD93D;color:#FFD93D">Extra Patterns</button>
+    <button class="filter-btn" id="exportBtn" style="border-color:var(--pink);color:var(--pink)">Export GOOD List</button>
+  </div>
+</header>
+
+<div class="count-badge" id="countBadge"></div>
+<div class="grid" id="grid"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <button class="modal-close" onclick="closeModal()">&times;</button>
+  <div class="modal">
+    <div class="modal-img">
+      <img id="modalImg" src="">
+      <div class="img-toggle" id="imgToggle"></div>
+    </div>
+    <div class="modal-detail">
+      <h2 id="modalTitle"></h2>
+      <div class="meta-row" id="modalMeta"></div>
+      <p style="font-size:13px;color:#ccc" id="modalCopy"></p>
+      <div style="font-size:12px;color:var(--muted)" id="modalN1"></div>
+      <h4 style="font-size:13px;color:var(--accent);margin-top:8px">Prompt / Design Intent</h4>
+      <div class="prompt-box" id="modalPrompt"></div>
+      <div class="modal-dl" id="modalDl"></div>
+      <div class="rate-row">
+        <button class="btn-good" onclick="rateCurrent('good')">GOOD</button>
+        <button class="btn-bad" onclick="rateCurrent('bad')">BAD</button>
+        <button class="btn-reset" onclick="rateCurrent(null)">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auth
+const PASS_HASH = "40631db6";
+function simpleHash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h).toString(16).slice(0,12)}
+function tryAuth(){
+  const input=document.getElementById("authInput").value;
+  if(simpleHash(input)===PASS_HASH){
+    sessionStorage.setItem("authed","1");
+    document.getElementById("authGate").classList.add("hidden");
+    document.getElementById("app").style.display="block";
+  }else{
+    document.getElementById("authErr").textContent="Incorrect password";
+  }
+}
+document.getElementById("authInput").addEventListener("keydown",e=>{if(e.key==="Enter")tryAuth()});
+if(sessionStorage.getItem("authed")==="1"){
+  document.getElementById("authGate").classList.add("hidden");
+  document.getElementById("app").style.display="block";
+}
+
+// Data
+let allBanners=[];
+let ratings=JSON.parse(localStorage.getItem("bihadado_ratings")||"{}");
+let currentFilter="all";
+let currentSort="random";
+let currentSearch="";
+let currentModalId=null;
+let shuffledOrder=[];
+
+function saveRatings(){localStorage.setItem("bihadado_ratings",JSON.stringify(ratings))}
+function getRate(id){return ratings[id]||null}
+function setRate(id,val){if(val)ratings[id]=val;else delete ratings[id];saveRatings()}
+
+function render(){
+  let filtered=allBanners.filter(b=>{
+    if(currentFilter==="good")return getRate(b.id)==="good";
+    if(currentFilter==="bad")return getRate(b.id)==="bad";
+    if(currentFilter==="unrated")return !getRate(b.id);
+    if(currentFilter==="extra")return b.isExtra;
+    if(currentFilter==="old")return b.version==="v1";
+    if(currentFilter!=="all")return b.conceptId===currentFilter;
+    return true;
+  });
+  if(currentSearch){
+    const q=currentSearch.toLowerCase();
+    filtered=filtered.filter(b=>(b.copy+b.patternLabel+b.pattern+b.group+b.concept).toLowerCase().includes(q));
+  }
+  // Sort
+  const sorted=[...filtered];
+  switch(currentSort){
+    case"version":sorted.sort((a,b)=>a.version.localeCompare(b.version)||a.id.localeCompare(b.id));break;
+    case"concept":sorted.sort((a,b)=>a.conceptId.localeCompare(b.conceptId)||a.id.localeCompare(b.id));break;
+    case"pattern":sorted.sort((a,b)=>a.pattern.localeCompare(b.pattern));break;
+    case"winScore-desc":sorted.sort((a,b)=>b.winScore-a.winScore);break;
+    case"winScore-asc":sorted.sort((a,b)=>a.winScore-b.winScore);break;
+    case"rated-first":sorted.sort((a,b)=>(getRate(b.id)?1:0)-(getRate(a.id)?1:0));break;
+    case"unrated-first":sorted.sort((a,b)=>(getRate(a.id)?1:0)-(getRate(b.id)?1:0));break;
+    case"random":sorted.sort((a,b)=>shuffledOrder.indexOf(a.id)-shuffledOrder.indexOf(b.id));break;
+  }
+  // Stats
+  const goodC=allBanners.filter(b=>getRate(b.id)==="good").length;
+  const badC=allBanners.filter(b=>getRate(b.id)==="bad").length;
+  document.getElementById("totalCount").textContent=allBanners.length;
+  document.getElementById("showCount").textContent=sorted.length;
+  document.getElementById("goodCount").textContent=goodC;
+  document.getElementById("badCount").textContent=badC;
+  document.getElementById("countBadge").textContent=sorted.length+" banners";
+
+  const grid=document.getElementById("grid");
+  grid.innerHTML="";
+  sorted.forEach(b=>{
+    const rate=getRate(b.id);
+    const div=document.createElement("div");
+    div.className="card"+(rate?" rated-"+rate:"");
+    div.innerHTML=`
+      <div class="card-actions">
+        <button class="rate-btn rate-good" onclick="event.stopPropagation();rateCard('${b.id}','good')">&#10003;</button>
+        <button class="rate-btn rate-bad" onclick="event.stopPropagation();rateCard('${b.id}','bad')">&#10005;</button>
+      </div>
+      <img src="${b.thumb}" loading="lazy" alt="${b.patternLabel}">
+      <div class="card-body">
+        <div class="tags">
+          <span class="tag tag-version">${b.version}</span>
+          ${b.conceptId?'<span class="tag tag-concept">'+b.conceptId+'</span>':""}
+          ${b.isExtra?'<span class="tag tag-extra">Extra</span>':""}
+          ${rate==="good"?'<span class="tag" style="background:#1e3a28;color:#4ECDC4">GOOD</span>':""}
+          ${rate==="bad"?'<span class="tag" style="background:#3a1e1e;color:#FF6B6B">BAD</span>':""}
+        </div>
+        <h3>${b.patternLabel}</h3>
+        <p>${b.copy}</p>
+      </div>`;
+    div.addEventListener("click",()=>openModal(b.id));
+    grid.appendChild(div);
+  });
+}
+
+function rateCard(id,val){
+  const cur=getRate(id);
+  if(cur===val)setRate(id,null);else setRate(id,val);
+  render();
+}
+
+function openModal(id){
+  const b=allBanners.find(x=>x.id===id);
+  if(!b)return;
+  currentModalId=id;
+  document.getElementById("modalImg").src=b.full;
+  document.getElementById("modalTitle").textContent=b.patternLabel;
+  document.getElementById("modalCopy").textContent=b.copy&&b.copy!=="\u2014"?b.copy:"";
+  document.getElementById("modalN1").textContent=b.n1&&b.n1!=="\u2014"?"N1: "+b.n1+(b.winScore?" | WinScore: "+b.winScore:""):"";
+  document.getElementById("modalPrompt").textContent=b.prompt||"No prompt data";
+
+  // Meta tags
+  const meta=document.getElementById("modalMeta");
+  meta.innerHTML=`<span class="tag tag-version">${b.version}</span>`
+    +(b.conceptId?`<span class="tag tag-concept">${b.conceptId} ${b.concept}</span>`:"")
+    +`<span class="tag" style="background:#1a1a1a;color:#888">${b.group}</span>`;
+
+  // Image toggle
+  const toggle=document.getElementById("imgToggle");
+  toggle.innerHTML=`<button class="active" onclick="showImg('full','${id}',this)">Annotated</button>`;
+  if(b.noanno) toggle.innerHTML+=`<button onclick="showImg('noanno','${id}',this)">No Annotation</button>`;
+
+  // Download links
+  const dl=document.getElementById("modalDl");
+  dl.innerHTML=`<a href="${b.full}" download="${b.id}.jpg">DL Annotated</a>`;
+  if(b.noanno) dl.innerHTML+=`<a href="${b.noanno}" download="${b.id}_noanno.jpg">DL No Annotation</a>`;
+
+  document.getElementById("modal").classList.add("active");
+}
+function showImg(type,id,btn){
+  const b=allBanners.find(x=>x.id===id);
+  document.getElementById("modalImg").src=type==="noanno"?b.noanno:b.full;
+  document.querySelectorAll("#imgToggle button").forEach(x=>x.classList.remove("active"));
+  btn.classList.add("active");
+}
+function closeModal(){document.getElementById("modal").classList.remove("active");currentModalId=null}
+function rateCurrent(val){if(!currentModalId)return;const cur=getRate(currentModalId);if(cur===val)setRate(currentModalId,null);else setRate(currentModalId,val);render()}
+
+// Keyboard
+document.addEventListener("keydown",e=>{
+  if(document.getElementById("authGate").classList.contains("hidden")===false)return;
+  if(e.key==="Escape")closeModal();
+  if(currentModalId){
+    if(e.key==="ArrowRight")rateCurrent("good");
+    if(e.key==="ArrowLeft")rateCurrent("bad");
+  }
+});
+
+// Filter buttons
+document.querySelectorAll(".filter-btn[data-filter]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".filter-btn[data-filter]").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter=btn.dataset.filter;
+    render();
+  });
+});
+document.getElementById("sortSelect").addEventListener("change",e=>{currentSort=e.target.value;render()});
+document.getElementById("searchInput").addEventListener("input",e=>{currentSearch=e.target.value;render()});
+
+// Export
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const goods=allBanners.filter(b=>getRate(b.id)==="good");
+  if(!goods.length){alert("No GOOD banners yet");return}
+  const lines=goods.map(b=>`${b.id}\t${b.conceptId}\t${b.patternLabel}\t${b.copy}`);
+  const text="GOOD Banners ("+goods.length+")\nID\tConcept\tPattern\tCopy\n"+lines.join("\n");
+  navigator.clipboard.writeText(text).then(()=>alert("Copied "+goods.length+" GOOD banners!"));
+});
+
+// Modal click outside
+document.getElementById("modal").addEventListener("click",e=>{if(e.target===document.getElementById("modal"))closeModal()});
+
+// Load data
+fetch("data.json").then(r=>r.json()).then(data=>{
+  allBanners=data;
+  shuffledOrder=data.map(b=>b.id).sort(()=>Math.random()-0.5);
+  render();
+});
+</script>
+</body>
+</html>
