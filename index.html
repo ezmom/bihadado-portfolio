@@ -371,6 +371,7 @@ if(sessionStorage.getItem("authed")==="1"){
 
 // Data
 let allBanners=[];
+let defaultRatings={};
 let ratings=JSON.parse(localStorage.getItem("bihadado_ratings")||"{}");
 let currentFilter="all";
 let currentSort="random";
@@ -638,9 +639,22 @@ document.getElementById("exportBtn").addEventListener("click",()=>{
 // Modal click outside
 document.getElementById("modal").addEventListener("click",e=>{if(e.target===document.getElementById("modal"))closeModal()});
 
-// Load data
-fetch("data.json").then(r=>r.json()).then(data=>{
+// Load data + default ratings
+Promise.all([
+  fetch("data.json").then(r=>r.json()),
+  fetch("default-ratings.json").then(r=>r.json()).catch(()=>({}))
+]).then(([data,defR])=>{
   allBanners=data;
+  defaultRatings=defR;
+  // Merge: default ratings as base, localStorage overrides
+  // If localStorage is empty/fresh, use defaults
+  const stored=JSON.parse(localStorage.getItem("bihadado_ratings")||"{}");
+  if(Object.keys(stored).length===0){
+    ratings={...defaultRatings};
+  }else{
+    ratings={...defaultRatings,...stored};
+  }
+  saveRatings();
   shuffledOrder=data.map(b=>b.id).sort(()=>Math.random()-0.5);
   render();
 });
