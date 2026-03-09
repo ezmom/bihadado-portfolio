@@ -27,6 +27,10 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop
 .stats-bar .val{font-weight:700}
 .stats-bar .good{color:var(--green)}
 .stats-bar .bad{color:var(--red)}
+.view-toggle{display:flex;gap:6px;margin-left:16px}
+.view-btn{background:#1a1a1a;border:1px solid var(--border);border-radius:8px;padding:5px 12px;font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s}
+.view-btn:hover{border-color:var(--accent);color:var(--accent)}
+.view-btn.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600}
 
 /* FILTERS */
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -38,7 +42,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop
 .search-input:focus{border-color:var(--accent)}
 
 /* GRID */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;padding:20px 24px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:20px 24px}
 .card{background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--border);transition:transform .2s,box-shadow .2s;cursor:pointer;position:relative}
 .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
 .card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
@@ -48,8 +52,6 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop
 .tag-version{background:#1e3a38;color:var(--accent)}
 .tag-concept{background:#3a1e2a;color:var(--pink)}
 .tag-extra{background:#2a2a1e;color:var(--yellow)}
-.card-body h3{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-body p{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity .2s}
 .card:hover .card-actions{opacity:1}
 .rate-btn{width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:transform .15s}
@@ -85,11 +87,98 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop
 /* COUNT BADGE */
 .count-badge{font-size:12px;color:var(--muted);padding:0 24px 8px}
 
+/* =============================
+   INSTAGRAM PREVIEW MODE
+   ============================= */
+#instaPreview{position:fixed;inset:0;background:#000;z-index:300;display:none;align-items:center;justify-content:center;overflow:hidden}
+#instaPreview.active{display:flex}
+
+.insta-close{position:fixed;top:20px;right:20px;z-index:310;background:rgba(255,255,255,0.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;backdrop-filter:blur(8px)}
+.insta-close:hover{background:rgba(255,255,255,0.25)}
+
+.insta-container{display:flex;align-items:center;gap:32px;height:100vh;padding:20px}
+
+/* Nav arrows */
+.insta-nav{background:rgba(255,255,255,0.1);border:none;color:#fff;width:56px;height:56px;border-radius:50%;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;backdrop-filter:blur(8px)}
+.insta-nav:hover{background:rgba(255,255,255,0.2);transform:scale(1.05)}
+.insta-nav:disabled{opacity:.2;cursor:default;transform:none}
+
+/* Phone frame */
+.phone-frame{width:375px;flex-shrink:0;background:#fff;border-radius:44px;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.6);position:relative;max-height:calc(100vh - 40px);display:flex;flex-direction:column}
+
+/* Phone top bar (status bar) */
+.phone-status{height:50px;background:#fff;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;font-size:14px;font-weight:600;color:#000;position:relative}
+.phone-status::before{content:"";position:absolute;top:14px;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#000;border-radius:20px}
+
+/* IG header */
+.ig-header{display:flex;align-items:center;padding:10px 14px;background:#fff;gap:10px}
+.ig-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ig-avatar-inner{width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#333}
+.ig-user{flex:1}
+.ig-user .ig-name{font-size:13px;font-weight:600;color:#000;line-height:1.2}
+.ig-user .ig-sponsor{font-size:10px;color:#888;line-height:1.2}
+.ig-dots{color:#333;font-size:18px;letter-spacing:2px;cursor:default}
+
+/* IG image */
+.ig-image-wrap{position:relative;width:375px;background:#f0f0f0}
+.ig-image-wrap img{width:100%;display:block}
+
+/* IG actions bar */
+.ig-actions{display:flex;align-items:center;padding:10px 14px;background:#fff;gap:16px}
+.ig-action-icon{width:24px;height:24px;cursor:default}
+.ig-actions .ig-save{margin-left:auto}
+
+/* IG CTA button */
+.ig-cta{display:flex;align-items:center;justify-content:space-between;margin:0 14px;padding:10px 14px;border:1px solid #dbdbdb;border-radius:8px;background:#fff;cursor:default}
+.ig-cta-text{font-size:13px;font-weight:600;color:#0095f6}
+.ig-cta-arrow{color:#0095f6;font-size:16px}
+
+/* IG likes / caption */
+.ig-bottom{padding:8px 14px 14px;background:#fff}
+.ig-likes{font-size:13px;font-weight:600;color:#000;margin-bottom:4px}
+.ig-caption{font-size:12px;color:#333;line-height:1.4}
+.ig-caption b{font-weight:600}
+
+/* Side panel (right side info) */
+.insta-side{width:320px;flex-shrink:0;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 40px);overflow-y:auto}
+.insta-side .side-counter{text-align:center;font-size:14px;color:var(--muted)}
+.insta-side .side-counter b{color:#fff;font-size:18px}
+.insta-side .side-info{background:#111;border-radius:12px;padding:16px;border:1px solid var(--border)}
+.insta-side .side-info h3{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.insta-side .side-info p{font-size:12px;color:#aaa;line-height:1.5}
+.insta-side .side-tags{display:flex;gap:6px;flex-wrap:wrap}
+.insta-side .side-prompt{background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:11px;color:#999;line-height:1.5;white-space:pre-wrap;max-height:160px;overflow-y:auto}
+.insta-side .side-rate{display:flex;gap:10px}
+.insta-side .side-rate button{flex:1;padding:12px;border-radius:12px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
+.insta-side .side-rate button:hover{transform:scale(1.02)}
+.side-rate .sr-good{background:var(--green);color:#000}
+.side-rate .sr-bad{background:var(--red);color:#fff}
+.side-rate .sr-reset{background:#1a1a1a;color:var(--muted);border:1px solid var(--border)}
+.side-dl{display:flex;gap:8px}
+.side-dl a{font-size:11px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);border-radius:8px;padding:6px 12px;transition:all .15s}
+.side-dl a:hover{background:var(--accent);color:#000}
+.side-rating-badge{text-align:center;padding:8px;border-radius:8px;font-weight:700;font-size:14px}
+.side-rating-badge.good-badge{background:rgba(78,205,196,0.15);color:var(--green);border:1px solid var(--green)}
+.side-rating-badge.bad-badge{background:rgba(255,107,107,0.15);color:var(--red);border:1px solid var(--red)}
+
+/* Keyboard hint */
+.insta-hint{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:16px;font-size:11px;color:#555;z-index:310}
+.insta-hint kbd{background:#222;border:1px solid #444;border-radius:4px;padding:2px 8px;font-size:11px;color:#aaa}
+
 /* RESPONSIVE */
+@media(max-width:1200px){
+  .insta-side{display:none}
+  .insta-container{gap:16px}
+}
 @media(max-width:768px){
   .modal{grid-template-columns:1fr}
   .modal-img img{border-radius:16px 16px 0 0}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));padding:12px}
+  .grid{grid-template-columns:repeat(2,1fr);padding:12px}
+  .phone-frame{width:320px;border-radius:36px}
+  .ig-image-wrap{width:320px}
+  .phone-status::before{width:100px;height:24px;top:12px}
+  .insta-nav{width:44px;height:44px;font-size:22px}
+  .insta-container{gap:12px}
 }
 </style>
 </head>
@@ -109,11 +198,17 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop
 <header>
   <div class="header-top">
     <div class="logo">BIHADADO PORTFOLIO</div>
-    <div class="stats-bar">
-      <span>Total: <span class="val" id="totalCount">0</span></span>
-      <span>Showing: <span class="val" id="showCount">0</span></span>
-      <span class="good">GOOD: <span class="val" id="goodCount">0</span></span>
-      <span class="bad">BAD: <span class="val" id="badCount">0</span></span>
+    <div style="display:flex;align-items:center">
+      <div class="stats-bar">
+        <span>Total: <span class="val" id="totalCount">0</span></span>
+        <span>Showing: <span class="val" id="showCount">0</span></span>
+        <span class="good">GOOD: <span class="val" id="goodCount">0</span></span>
+        <span class="bad">BAD: <span class="val" id="badCount">0</span></span>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn active" data-view="grid">Grid</button>
+        <button class="view-btn" data-view="insta">Insta Preview</button>
+      </div>
     </div>
   </div>
   <div class="filters">
@@ -149,7 +244,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop
 <div class="grid" id="grid"></div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL (Grid mode) -->
 <div class="modal-overlay" id="modal">
   <button class="modal-close" onclick="closeModal()">&times;</button>
   <div class="modal">
@@ -171,6 +266,86 @@ header{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.95);backdrop
         <button class="btn-reset" onclick="rateCurrent(null)">Reset</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- INSTAGRAM PREVIEW MODE -->
+<div id="instaPreview">
+  <button class="insta-close" onclick="closeInsta()">&times;</button>
+  <div class="insta-container">
+    <!-- Left arrow -->
+    <button class="insta-nav" id="instaPrev" onclick="instaGo(-1)">&#8592;</button>
+
+    <!-- Phone -->
+    <div class="phone-frame">
+      <div class="phone-status">
+        <span style="position:relative;z-index:1"></span>
+      </div>
+      <!-- IG Header -->
+      <div class="ig-header">
+        <div class="ig-avatar"><div class="ig-avatar-inner">B</div></div>
+        <div class="ig-user">
+          <div class="ig-name">bihadado_latrico</div>
+          <div class="ig-sponsor">Sponsored</div>
+        </div>
+        <div class="ig-dots">&middot;&middot;&middot;</div>
+      </div>
+      <!-- IG Image -->
+      <div class="ig-image-wrap">
+        <img id="igImg" src="" alt="">
+      </div>
+      <!-- IG Actions -->
+      <div class="ig-actions">
+        <svg class="ig-action-icon" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <svg class="ig-action-icon" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <svg class="ig-action-icon" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M22 2L15 22l-4-9-9-4z"/></svg>
+        <svg class="ig-action-icon ig-save" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <!-- CTA -->
+      <div class="ig-cta">
+        <span class="ig-cta-text">Learn More</span>
+        <span class="ig-cta-arrow">&#8250;</span>
+      </div>
+      <!-- Bottom -->
+      <div class="ig-bottom">
+        <div class="ig-likes">1,234 likes</div>
+        <div class="ig-caption" id="igCaption"><b>bihadado_latrico</b> </div>
+      </div>
+    </div>
+
+    <!-- Right arrow -->
+    <button class="insta-nav" id="instaNext" onclick="instaGo(1)">&#8594;</button>
+
+    <!-- Side panel -->
+    <div class="insta-side" id="instaSide">
+      <div class="side-counter"><b id="instaIdx">1</b> / <span id="instaTotal">0</span></div>
+      <div id="instaRatingBadge"></div>
+      <div class="side-info">
+        <h3 id="instaSideTitle"></h3>
+        <div class="side-tags" id="instaSideTags"></div>
+        <p id="instaSideCopy" style="margin-top:8px"></p>
+        <p id="instaSideN1" style="margin-top:4px;font-size:11px;color:#666"></p>
+      </div>
+      <div class="side-info">
+        <h3>Prompt / Design Intent</h3>
+        <div class="side-prompt" id="instaSidePrompt"></div>
+      </div>
+      <div class="side-dl" id="instaSideDl"></div>
+      <div class="side-rate">
+        <button class="sr-good" onclick="instaRate('good')">GOOD</button>
+        <button class="sr-bad" onclick="instaRate('bad')">BAD</button>
+        <button class="sr-reset" onclick="instaRate(null)">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="insta-hint">
+    <span><kbd>&#8592;</kbd> Previous</span>
+    <span><kbd>&#8594;</kbd> Next</span>
+    <span><kbd>G</kbd> GOOD</span>
+    <span><kbd>B</kbd> BAD</span>
+    <span><kbd>R</kbd> Reset</span>
+    <span><kbd>Esc</kbd> Close</span>
   </div>
 </div>
 
@@ -202,12 +377,17 @@ let currentSort="random";
 let currentSearch="";
 let currentModalId=null;
 let shuffledOrder=[];
+let currentView="grid";
+
+// Insta state
+let instaList=[];
+let instaIndex=0;
 
 function saveRatings(){localStorage.setItem("bihadado_ratings",JSON.stringify(ratings))}
 function getRate(id){return ratings[id]||null}
 function setRate(id,val){if(val)ratings[id]=val;else delete ratings[id];saveRatings()}
 
-function render(){
+function getFiltered(){
   let filtered=allBanners.filter(b=>{
     if(currentFilter==="good")return getRate(b.id)==="good";
     if(currentFilter==="bad")return getRate(b.id)==="bad";
@@ -221,7 +401,6 @@ function render(){
     const q=currentSearch.toLowerCase();
     filtered=filtered.filter(b=>(b.copy+b.patternLabel+b.pattern+b.group+b.concept).toLowerCase().includes(q));
   }
-  // Sort
   const sorted=[...filtered];
   switch(currentSort){
     case"version":sorted.sort((a,b)=>a.version.localeCompare(b.version)||a.id.localeCompare(b.id));break;
@@ -233,7 +412,10 @@ function render(){
     case"unrated-first":sorted.sort((a,b)=>(getRate(a.id)?1:0)-(getRate(b.id)?1:0));break;
     case"random":sorted.sort((a,b)=>shuffledOrder.indexOf(a.id)-shuffledOrder.indexOf(b.id));break;
   }
-  // Stats
+  return sorted;
+}
+
+function updateStats(sorted){
   const goodC=allBanners.filter(b=>getRate(b.id)==="good").length;
   const badC=allBanners.filter(b=>getRate(b.id)==="bad").length;
   document.getElementById("totalCount").textContent=allBanners.length;
@@ -241,6 +423,11 @@ function render(){
   document.getElementById("goodCount").textContent=goodC;
   document.getElementById("badCount").textContent=badC;
   document.getElementById("countBadge").textContent=sorted.length+" banners";
+}
+
+function render(){
+  const sorted=getFiltered();
+  updateStats(sorted);
 
   const grid=document.getElementById("grid");
   grid.innerHTML="";
@@ -265,7 +452,15 @@ function render(){
         <h3>${b.patternLabel}</h3>
         <p>${b.copy}</p>
       </div>`;
-    div.addEventListener("click",()=>openModal(b.id));
+    div.addEventListener("click",()=>{
+      if(currentView==="insta"){
+        // Open in insta preview at this index
+        const idx=sorted.findIndex(x=>x.id===b.id);
+        openInsta(sorted,idx>=0?idx:0);
+      }else{
+        openModal(b.id);
+      }
+    });
     grid.appendChild(div);
   });
 }
@@ -286,18 +481,15 @@ function openModal(id){
   document.getElementById("modalN1").textContent=b.n1&&b.n1!=="\u2014"?"N1: "+b.n1+(b.winScore?" | WinScore: "+b.winScore:""):"";
   document.getElementById("modalPrompt").textContent=b.prompt||"No prompt data";
 
-  // Meta tags
   const meta=document.getElementById("modalMeta");
   meta.innerHTML=`<span class="tag tag-version">${b.version}</span>`
     +(b.conceptId?`<span class="tag tag-concept">${b.conceptId} ${b.concept}</span>`:"")
     +`<span class="tag" style="background:#1a1a1a;color:#888">${b.group}</span>`;
 
-  // Image toggle
   const toggle=document.getElementById("imgToggle");
   toggle.innerHTML=`<button class="active" onclick="showImg('full','${id}',this)">Annotated</button>`;
   if(b.noanno) toggle.innerHTML+=`<button onclick="showImg('noanno','${id}',this)">No Annotation</button>`;
 
-  // Download links
   const dl=document.getElementById("modalDl");
   dl.innerHTML=`<a href="${b.full}" download="${b.id}.jpg">DL Annotated</a>`;
   if(b.noanno) dl.innerHTML+=`<a href="${b.noanno}" download="${b.id}_noanno.jpg">DL No Annotation</a>`;
@@ -313,14 +505,113 @@ function showImg(type,id,btn){
 function closeModal(){document.getElementById("modal").classList.remove("active");currentModalId=null}
 function rateCurrent(val){if(!currentModalId)return;const cur=getRate(currentModalId);if(cur===val)setRate(currentModalId,null);else setRate(currentModalId,val);render()}
 
+// ===============
+// INSTAGRAM MODE
+// ===============
+function openInsta(list,idx){
+  instaList=list||getFiltered();
+  instaIndex=typeof idx==="number"?idx:0;
+  document.getElementById("instaPreview").classList.add("active");
+  document.getElementById("instaTotal").textContent=instaList.length;
+  renderInsta();
+}
+function closeInsta(){
+  document.getElementById("instaPreview").classList.remove("active");
+  render(); // refresh grid ratings
+}
+function instaGo(delta){
+  const next=instaIndex+delta;
+  if(next<0||next>=instaList.length)return;
+  instaIndex=next;
+  renderInsta();
+}
+function instaRate(val){
+  if(!instaList.length)return;
+  const b=instaList[instaIndex];
+  const cur=getRate(b.id);
+  if(cur===val)setRate(b.id,null);else setRate(b.id,val);
+  renderInsta();
+}
+
+function renderInsta(){
+  if(!instaList.length)return;
+  const b=instaList[instaIndex];
+  const rate=getRate(b.id);
+
+  // Phone image
+  document.getElementById("igImg").src=b.full;
+
+  // Caption
+  const captionText=b.copy&&b.copy!=="\u2014"?b.copy:"";
+  document.getElementById("igCaption").innerHTML=`<b>bihadado_latrico</b> ${escHtml(captionText)}`;
+
+  // Counter
+  document.getElementById("instaIdx").textContent=instaIndex+1;
+
+  // Nav buttons
+  document.getElementById("instaPrev").disabled=instaIndex===0;
+  document.getElementById("instaNext").disabled=instaIndex>=instaList.length-1;
+
+  // Side panel
+  document.getElementById("instaSideTitle").textContent=b.patternLabel;
+  document.getElementById("instaSideCopy").textContent=captionText;
+  document.getElementById("instaSideN1").textContent=b.n1&&b.n1!=="\u2014"?"N1: "+b.n1+(b.winScore?" | WinScore: "+b.winScore:""):"";
+  document.getElementById("instaSidePrompt").textContent=b.prompt||"No prompt data";
+
+  // Tags
+  const tagsEl=document.getElementById("instaSideTags");
+  tagsEl.innerHTML=`<span class="tag tag-version">${b.version}</span>`
+    +(b.conceptId?`<span class="tag tag-concept">${b.conceptId} ${b.concept}</span>`:"")
+    +(b.isExtra?`<span class="tag tag-extra">Extra</span>`:"")
+    +`<span class="tag" style="background:#1a1a1a;color:#888">${b.group}</span>`;
+
+  // Rating badge
+  const badge=document.getElementById("instaRatingBadge");
+  if(rate==="good") badge.innerHTML=`<div class="side-rating-badge good-badge">GOOD</div>`;
+  else if(rate==="bad") badge.innerHTML=`<div class="side-rating-badge bad-badge">BAD</div>`;
+  else badge.innerHTML="";
+
+  // DL links
+  const dl=document.getElementById("instaSideDl");
+  dl.innerHTML=`<a href="${b.full}" download="${b.id}.jpg">DL Annotated</a>`;
+  if(b.noanno) dl.innerHTML+=`<a href="${b.noanno}" download="${b.id}_noanno.jpg">DL No Annotation</a>`;
+}
+
+function escHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
 // Keyboard
 document.addEventListener("keydown",e=>{
-  if(document.getElementById("authGate").classList.contains("hidden")===false)return;
+  if(!document.getElementById("authGate").classList.contains("hidden"))return;
+
+  // Insta mode keys
+  if(document.getElementById("instaPreview").classList.contains("active")){
+    if(e.key==="Escape")closeInsta();
+    else if(e.key==="ArrowRight")instaGo(1);
+    else if(e.key==="ArrowLeft")instaGo(-1);
+    else if(e.key.toLowerCase()==="g")instaRate("good");
+    else if(e.key.toLowerCase()==="b")instaRate("bad");
+    else if(e.key.toLowerCase()==="r")instaRate(null);
+    return;
+  }
+
+  // Modal keys
   if(e.key==="Escape")closeModal();
   if(currentModalId){
     if(e.key==="ArrowRight")rateCurrent("good");
     if(e.key==="ArrowLeft")rateCurrent("bad");
   }
+});
+
+// View toggle
+document.querySelectorAll(".view-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".view-btn").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    currentView=btn.dataset.view;
+    if(currentView==="insta"){
+      openInsta(getFiltered(),0);
+    }
+  });
 });
 
 // Filter buttons
